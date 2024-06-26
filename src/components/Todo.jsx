@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import todo_icon from '../assets/todo_icon.png'
 import TodoItems from './TodoItems'
 const Todo = () => {
@@ -10,19 +10,41 @@ const Todo = () => {
 
     const add = () => {
         const inputText = inputRef.current.value.trim();
-            if(inputText===""){
-                return null;
-            }
+        if (inputText === "") {
+            return null;
+        }
 
         const newTodo = {
             id: Date.now(),
             text: inputText,
-            isComplete : false,
+            isComplete: false,
         }
-        setTodoList(()=>[...prev, newTodo]);
+        setTodoList((prev) => [...prev, newTodo]);
         inputRef.current.value = "";
     }
 
+    const deleteTodo = (id) => {
+        setTodoList((prvTodos) => {
+            return prvTodos.filter((todo) => todo.id !== id)
+        })
+    }
+
+    const toggle = (id) => {
+        setTodoList((prevTodos) => {
+            return prevTodos.map((todo) => {
+                if (todo.id === id) {
+                    return { ...todo, isComplete: !todo.isComplete };
+                }
+                return todo;
+            })
+        })
+
+    }
+
+     useEffect(() => {
+        console.log(todoList);
+
+     },[todoList])
 
 
     return (
@@ -37,8 +59,16 @@ const Todo = () => {
                 <button onClick={add} className='border-none rounded-full bg-orange-600 w-32 h-14 text-white text-lg font-medium cursor-pointer'>ADD +</button>
             </div>
             {/* todo list */}
-            <TodoItems text="Learn" />
-            <TodoItems text="Learn Coding" />
+            <div>
+                {todoList.map((item, index) => {
+                    return <TodoItems key={index} text={item.text} id={item.id}
+                        isComplete={item.isComplete} deleteTodo={deleteTodo} toggle={toggle}
+                    />
+                })}
+
+
+            </div>
+
         </div>
     )
 }
